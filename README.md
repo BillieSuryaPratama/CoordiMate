@@ -1,6 +1,5 @@
 # Project Grafika Komputer
 # CoordiMate: Aplikasi Menggambar Sederhana Sebagai Inovasi Pembelajaran Konsep Koordinat bagi Siswa SMP
-<br>
 
 Anggota Kelompok:
 <br>

@@ -67,20 +67,48 @@ def isClicked(mouse_pos, button_pos, button_width, button_height):
     )
 
 # Button Main Menu
-MenuButtons = [
+ButtonsMenu = [
     {'label': 'Menggambar Bebas', 'pos': (450, 300), 'ButtonColor': BLUE_BUTTON, 'TextColor': WHITE},
     {'label': 'Pencerminan', 'pos': (450, 400), 'ButtonColor': BLUE_BUTTON, 'TextColor': WHITE},
     {'label': 'Exit', 'pos': (450, 500), 'ButtonColor': RED_BUTTON, 'TextColor': WHITE}
 ]
 
 # Button Menggambar Bebas
-DrawingButtons = [
+ButtonsMenggambar = [
     {'label': 'Persegi', 'pos': (25, 10), 'ButtonColor': BLUE_BUTTON, 'TextColor': WHITE},
     {'label': 'Lingkaran', 'pos': (25, 110), 'ButtonColor': BLUE_BUTTON, 'TextColor': WHITE},
     {'label': 'Garis', 'pos': (25, 210), 'ButtonColor': BLUE_BUTTON, 'TextColor': WHITE},
     {'label': 'Kurva', 'pos': (25, 310), 'ButtonColor': BLUE_BUTTON, 'TextColor': WHITE},
     {'label': 'Clear', 'pos': (25, 410), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
     {'label': 'Undo', 'pos': (25, 510), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
+    {'label': 'Back', 'pos': (25, 610), 'ButtonColor': RED_BUTTON, 'TextColor': WHITE}
+]
+
+# Button Menggambar Persegi
+ButtonsPersegi = [
+    {'label': 'Update', 'pos': (25, 410), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
+    {'label': 'Save', 'pos': (25, 510), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
+    {'label': 'Back', 'pos': (25, 610), 'ButtonColor': RED_BUTTON, 'TextColor': WHITE}
+]
+
+# Button Menggambar Lingkaran
+ButtonsLingkaran = [
+    {'label': 'Update', 'pos': (25, 410), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
+    {'label': 'Save', 'pos': (25, 510), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
+    {'label': 'Back', 'pos': (25, 610), 'ButtonColor': RED_BUTTON, 'TextColor': WHITE}
+]
+
+# Button Menggambar Garis
+ButtonsGaris = [
+    {'label': 'Update', 'pos': (25, 410), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
+    {'label': 'Save', 'pos': (25, 510), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
+    {'label': 'Back', 'pos': (25, 610), 'ButtonColor': RED_BUTTON, 'TextColor': WHITE}
+]
+
+# Button Menggambar Kurva
+ButtonsKurva = [
+    {'label': 'Update', 'pos': (25, 410), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
+    {'label': 'Save', 'pos': (25, 510), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
     {'label': 'Back', 'pos': (25, 610), 'ButtonColor': RED_BUTTON, 'TextColor': WHITE}
 ]
 
@@ -99,18 +127,18 @@ while running:
         title_surface = pygame.image.frombuffer(surface.get_data(), (WIDTH, HEIGHT), "BGRA")
         screen.blit(title_surface, (0, 0))
 
-        # Gambar tombol pada menu
-        for button in MenuButtons:
+        # Gambar tombol
+        for button in ButtonsMenu:
             btn_surf = Button(0, 0, 300, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
             screen.blit(btn_surf, button['pos'])
 
-        # Event handling menu
+        # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                for button in MenuButtons:
+                for button in ButtonsMenu:
                     if button['label'] == 'Exit' and isClicked((mouse_x, mouse_y), button['pos'], 300, 80):
                         running = False
                     elif button['label'] == 'Menggambar Bebas' and isClicked((mouse_x, mouse_y), button['pos'], 300, 80):
@@ -124,17 +152,17 @@ while running:
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
 
         # Gambar tombol
-        for button in DrawingButtons:
+        for button in ButtonsMenggambar:
             btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
             screen.blit(btn_surf, button['pos'])
 
-        # Event handling menggambar bebas
+        # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                for button in DrawingButtons:
+                for button in ButtonsMenggambar:
                     if button['label'] == 'Persegi' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
                         ShowPagePersegi = True
                         ShowPageMenggambar = False
@@ -161,10 +189,23 @@ while running:
         pygame.draw.rect(screen, BLACK, (250, 10, 940, 680)) #1190x690
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
 
-        # Event handling menggambar bebas
+        for button in ButtonsPersegi:
+            btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
+            screen.blit(btn_surf, button['pos'])
+
+        # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    pass
+                elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    pass
+                elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    ShowPageMenggambar = True
+                    ShowPagePersegi = False
 
     # Page Menggambar Lingkaran
     elif ShowPageLingkaran:
@@ -172,10 +213,24 @@ while running:
         pygame.draw.rect(screen, BLACK, (250, 10, 940, 680)) #1190x690
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
 
-        # Event handling menggambar bebas
+        # Gambar tombol
+        for button in ButtonsLingkaran:
+            btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
+            screen.blit(btn_surf, button['pos'])
+
+        # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    pass
+                elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    pass
+                elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    ShowPageMenggambar = True
+                    ShowPageLingkaran = False
 
     # Page Menggambar Garis
     elif ShowPageGaris:
@@ -183,10 +238,23 @@ while running:
         pygame.draw.rect(screen, BLACK, (250, 10, 940, 680)) #1190x690
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
 
-        # Event handling menggambar bebas
+        for button in ButtonsGaris:
+            btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
+            screen.blit(btn_surf, button['pos'])
+
+        # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    pass
+                elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    pass
+                elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    ShowPageMenggambar = True
+                    ShowPageGaris = False
 
     # Page Menggambar Kurva
     elif ShowPageKurva:
@@ -194,10 +262,23 @@ while running:
         pygame.draw.rect(screen, BLACK, (250, 10, 940, 680)) #1190x690
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
 
-        # Event handling menggambar bebas
+        for button in ButtonsKurva:
+            btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
+            screen.blit(btn_surf, button['pos'])
+
+        # Event handling
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    pass
+                elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    pass
+                elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                    ShowPageMenggambar = True
+                    ShowPageKurva = False
 
     pygame.display.flip()
 

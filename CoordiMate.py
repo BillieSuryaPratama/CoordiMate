@@ -214,6 +214,12 @@ while running:
         pygame.draw.rect(screen, BLACK, (250, 10, 940, 680)) #1190x690
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
 
+        for shape in Shape:
+            if shape[0] == 'persegi':
+                x, y, width, height = shape[1:]
+                persegi_surf = draw_persegi(x, y, width, height)
+                screen.blit(persegi_surf, (x + 255, y + 15))
+        
         # Gambar tombol
         for button in ButtonsMenggambar:
             btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
@@ -305,25 +311,32 @@ while running:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    pass
-                elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    try:
-                        x = int(PersegiStartX_input_text)
-                        y = int(PersegiStartY_input_text)
-                        Panjang = int(PersegiPanjang_input_text)
-                        Lebar = int(PersegiLebar_input_text)
-                        Shape.append(('persegi', x, y, Panjang, Lebar))
-                    except ValueError:
-                        print("Invalid input")
-                        continue
-                    ShowPagePersegi = False
-                    ShowPageMenggambar = True
-                elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    ShowPageMenggambar = True
-                    ShowPagePersegi = False
+                for button in ButtonsPersegi:
+                    if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        print (f"Nilai variabel x: {x}")
+                        print (f"Nilai variabel y: {y}")
+                        print (f"Nilai variabel x: {Panjang}")
+                        print (f"Nilai variabel x: {Lebar}")
+                        print (f"Nilai variabel SHAPE: {shape}")
+                        
 
-                elif PersegiStartX_input_box.collidepoint(event.pos):
+                    elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        try:
+                            x = int(PersegiStartX_input_text)
+                            y = int(PersegiStartY_input_text)
+                            Panjang = int(PersegiPanjang_input_text)
+                            Lebar = int(PersegiLebar_input_text)
+                            Shape.append(('persegi', x, y, Panjang, Lebar))
+                        except ValueError:
+                            print("Invalid input")
+                            continue
+                        ShowPagePersegi = False
+                        ShowPageMenggambar = True
+                    elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        ShowPageMenggambar = True
+                        ShowPagePersegi = False
+
+                if PersegiStartX_input_box.collidepoint(event.pos):
                     PersegiStartX_active = not PersegiStartX_active
                     PersegiStartY_active = False
                     PersegiPanjang_active = False

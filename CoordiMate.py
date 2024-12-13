@@ -78,6 +78,17 @@ def draw_text(screen, text, font, pos, color):
     txt_surface = font.render(text, True, color)
     screen.blit(txt_surface, pos)
 
+def draw_persegi(x, y, Panjang, Tinggi, line_width=1):
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, Panjang, Tinggi)
+    ctx = cairo.Context(surface)
+    ctx.set_source_rgb(0, 0, 0)
+    ctx.set_line_width(line_width)
+    ctx.rectangle(x, y, Panjang, Tinggi)
+    ctx.stroke()
+
+    return pygame.image.frombuffer(surface.get_data(), (Panjang, Tinggi), "BGRA")
+
+
 # Fungsi untuk memeriksa apakah tombol diklik
 def isClicked(mouse_pos, button_pos, button_width, button_height):
     return (
@@ -130,6 +141,9 @@ ButtonsKurva = [
     {'label': 'Back', 'pos': (25, 610), 'ButtonColor': RED_BUTTON, 'TextColor': WHITE}
 ]
 
+# Shape yang telah digambar
+Shape = []
+
 # Input box Persegi (PersegiStartX)
 PersegiStartX_input_box = pygame.Rect(25, 60, 200, 40)
 PersegiStartX_color_inactive = pygame.Color('lightskyblue3')
@@ -161,10 +175,6 @@ PersegiLebar_color_active = pygame.Color('dodgerblue2')
 PersegiLebar_color = PersegiLebar_color_inactive
 PersegiLebar_active = False
 PersegiLebar_input_text = ''
-
-
-# Shape yang telah digambar
-Shape = []
 
 # Loop Utama
 running = True
@@ -242,6 +252,12 @@ while running:
         pygame.draw.rect(screen, BLACK, (250, 10, 940, 680)) #1190x690
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
 
+        for shape in Shape:
+            if shape[0] == 'persegi':
+                x, y, width, height = shape[1:]
+                persegi_surf = draw_persegi(x, y, width, height)
+                screen.blit(persegi_surf, (x + 255, y + 15))
+        
         for button in ButtonsPersegi:
             btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
             screen.blit(btn_surf, button['pos'])
@@ -289,11 +305,20 @@ while running:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                
                 if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
                     pass
                 elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    pass
+                    try:
+                        x = int(PersegiStartX_input_text)
+                        y = int(PersegiStartY_input_text)
+                        Panjang = int(PersegiPanjang_input_text)
+                        Lebar = int(PersegiLebar_input_text)
+                        Shape.append(('persegi', x, y, Panjang, Lebar))
+                    except ValueError:
+                        print("Invalid input")
+                        continue
+                    ShowPagePersegi = False
+                    ShowPageMenggambar = True
                 elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
                     ShowPageMenggambar = True
                     ShowPagePersegi = False
@@ -327,42 +352,42 @@ while running:
             elif event.type == pygame.KEYDOWN and PersegiStartX_active:
                 if event.key == pygame.K_RETURN:
                     PersegiStartX_input_text = int(PersegiStartX_input_text)
-                    print(f"Input: {PersegiStartX_input_text}")  # Ganti dengan logika Anda
                     PersegiStartX_input_text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     PersegiStartX_input_text = PersegiStartX_input_text[:-1]
                 else:
                     PersegiStartX_input_text += event.unicode
+                    x = PersegiStartX_input_text
 
             elif event.type == pygame.KEYDOWN and PersegiStartY_active:
                 if event.key == pygame.K_RETURN:
                     PersegiStartY_input_text = int(PersegiStartY_input_text)
-                    print(f"Input: {PersegiStartY_input_text}")  # Ganti dengan logika Anda
                     PersegiStartY_input_text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     PersegiStartY_input_text = PersegiStartY_input_text[:-1]
                 else:
                     PersegiStartY_input_text += event.unicode
+                    y = PersegiStartY_input_text
 
             elif event.type == pygame.KEYDOWN and PersegiPanjang_active:
                 if event.key == pygame.K_RETURN:
                     PersegiPanjang_input_text = int(PersegiPanjang_input_text)
-                    print(f"Input: {PersegiPanjang_input_text}")  # Ganti dengan logika Anda
                     PersegiPanjang_input_text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     PersegiPanjang_input_text = PersegiPanjang_input_text[:-1]
                 else:
                     PersegiPanjang_input_text += event.unicode
+                    Panjang = PersegiPanjang_input_text
 
             elif event.type == pygame.KEYDOWN and PersegiLebar_active:
                 if event.key == pygame.K_RETURN:
                     PersegiLebar_input_text = int(PersegiLebar_input_text)
-                    print(f"Input: {PersegiLebar_input_text}")  # Ganti dengan logika Anda
                     PersegiLebar_input_text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     PersegiLebar_input_text = PersegiLebar_input_text[:-1]
                 else:
                     PersegiLebar_input_text += event.unicode
+                    Lebar = PersegiLebar_input_text
 
     # Page Menggambar Lingkaran
     elif ShowPageLingkaran:

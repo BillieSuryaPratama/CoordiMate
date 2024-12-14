@@ -5,12 +5,12 @@ import math
 WIDTH, HEIGHT = 1200, 700
 
 # Opsi warna
-BACKGROUND = (200, 255, 255)
+BACKGROUND = (36, 160, 237)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-BLUE_BUTTON = (36, 160, 237)
+BLUE_BUTTON = (0, 71, 171)
 RED_BUTTON = (210, 43, 43)
-GREEN_BUTTON = (60, 179, 113)
+GREEN_BUTTON = (31, 198, 0)
 
 # Inisialisasi pygame
 pygame.init()
@@ -78,16 +78,35 @@ def draw_text(screen, text, font, pos, color):
     txt_surface = font.render(text, True, color)
     screen.blit(txt_surface, pos)
 
-def draw_persegi(x, y, Panjang, Tinggi, line_width=1):
-    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, Panjang, Tinggi)
+def draw_persegi(x, y, Panjang, Tinggi, line_width=2):
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, Panjang + line_width * 2, Tinggi + line_width * 2)
     ctx = cairo.Context(surface)
     ctx.set_source_rgb(0, 0, 0)
     ctx.set_line_width(line_width)
-    ctx.rectangle(x, y, Panjang, Tinggi)
+    ctx.rectangle(line_width, line_width, Panjang, Tinggi)
     ctx.stroke()
 
-    return pygame.image.frombuffer(surface.get_data(), (Panjang, Tinggi), "BGRA")
+    return pygame.image.frombuffer(surface.get_data(), (Panjang + line_width * 2, Tinggi + line_width * 2), "BGRA")
 
+def draw_garis(x, y, endx, endy, line_width=2):
+    width = abs(endx - x)
+    height = abs(endy - y)
+
+    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width + line_width * 2, height + line_width * 2)
+    ctx = cairo.Context(surface)
+    ctx.set_source_rgb(0, 0, 0)
+    ctx.set_line_width(line_width)
+
+    start_x = line_width if x <= endx else width - line_width
+    start_y = line_width if y <= endy else height - line_width
+    end_x = width - line_width if x < endx else line_width
+    end_y = height - line_width if y < endy else line_width
+
+    ctx.move_to(start_x, start_y)
+    ctx.line_to(end_x, end_y)
+    ctx.stroke()
+
+    return pygame.image.frombuffer(surface.get_data(), (width + line_width * 2, height + line_width * 2), "BGRA")
 
 # Fungsi untuk memeriksa apakah tombol diklik
 def isClicked(mouse_pos, button_pos, button_width, button_height):
@@ -109,7 +128,7 @@ ButtonsMenggambar = [
     {'label': 'Garis', 'pos': (25, 210), 'ButtonColor': BLUE_BUTTON, 'TextColor': WHITE},
     {'label': 'Kurva', 'pos': (25, 310), 'ButtonColor': BLUE_BUTTON, 'TextColor': WHITE},
     {'label': 'Clear', 'pos': (25, 410), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
-    {'label': 'Undo', 'pos': (25, 510), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
+    {'label': 'Undo', 'pos': (135, 410), 'ButtonColor': GREEN_BUTTON, 'TextColor': WHITE},
     {'label': 'Back', 'pos': (25, 610), 'ButtonColor': RED_BUTTON, 'TextColor': WHITE}
 ]
 
@@ -144,37 +163,72 @@ ButtonsKurva = [
 # Shape yang telah digambar
 Shape = []
 
+# Variabel untuk Update
+Update = 0
+
 # Input box Persegi (PersegiStartX)
 PersegiStartX_input_box = pygame.Rect(25, 60, 200, 40)
-PersegiStartX_color_inactive = pygame.Color('lightskyblue3')
-PersegiStartX_color_active = pygame.Color('dodgerblue2')
+PersegiStartX_color_inactive = pygame.Color(BLUE_BUTTON)
+PersegiStartX_color_active = pygame.Color(BLACK)
 PersegiStartX_color = PersegiStartX_color_inactive
 PersegiStartX_active = False
 PersegiStartX_input_text = ''
 
 # Input box Persegi (PersegiStartY)
 PersegiStartY_input_box = pygame.Rect(25, 140, 200, 40)
-PersegiStartY_color_inactive = pygame.Color('lightskyblue3')
-PersegiStartY_color_active = pygame.Color('dodgerblue2')
+PersegiStartY_color_inactive = pygame.Color(BLUE_BUTTON)
+PersegiStartY_color_active = pygame.Color(BLACK)
 PersegiStartY_color = PersegiStartY_color_inactive
 PersegiStartY_active = False
 PersegiStartY_input_text = ''
 
 # Input box Persegi (PersegiPanjang)
 PersegiPanjang_input_box = pygame.Rect(25, 220, 200, 40)
-PersegiPanjang_color_inactive = pygame.Color('lightskyblue3')
-PersegiPanjang_color_active = pygame.Color('dodgerblue2')
+PersegiPanjang_color_inactive = pygame.Color(BLUE_BUTTON)
+PersegiPanjang_color_active = pygame.Color(BLACK)
 PersegiPanjang_color = PersegiPanjang_color_inactive
 PersegiPanjang_active = False
 PersegiPanjang_input_text = ''
 
 # Input box Persegi (PersegiLebar)
 PersegiLebar_input_box = pygame.Rect(25, 300, 200, 40)
-PersegiLebar_color_inactive = pygame.Color('lightskyblue3')
-PersegiLebar_color_active = pygame.Color('dodgerblue2')
+PersegiLebar_color_inactive = pygame.Color(BLUE_BUTTON)
+PersegiLebar_color_active = pygame.Color(BLACK)
 PersegiLebar_color = PersegiLebar_color_inactive
 PersegiLebar_active = False
 PersegiLebar_input_text = ''
+
+# Input box Garis (GarisStartX)
+GarisStartX_input_box = pygame.Rect(25, 60, 200, 40)
+GarisStartX_color_inactive = pygame.Color(BLUE_BUTTON)
+GarisStartX_color_active = pygame.Color(BLACK)
+GarisStartX_color = GarisStartX_color_inactive
+GarisStartX_active = False
+GarisStartX_input_text = ''
+
+# Input box Garis (GarisStartY)
+GarisStartY_input_box = pygame.Rect(25, 140, 200, 40)
+GarisStartY_color_inactive = pygame.Color(BLUE_BUTTON)
+GarisStartY_color_active = pygame.Color(BLACK)
+GarisStartY_color = GarisStartY_color_inactive
+GarisStartY_active = False
+GarisStartY_input_text = ''
+
+# Input box Garis (GarisEndX)
+GarisEndX_input_box = pygame.Rect(25, 220, 200, 40)
+GarisEndX_color_inactive = pygame.Color(BLUE_BUTTON)
+GarisEndX_color_active = pygame.Color(BLACK)
+GarisEndX_color = GarisEndX_color_inactive
+GarisEndX_active = False
+GarisEndX_input_text = ''
+
+# Input box Garis (GarisEndY)
+GarisEndY_input_box = pygame.Rect(25, 300, 200, 40)
+GarisEndY_color_inactive = pygame.Color(BLUE_BUTTON)
+GarisEndY_color_active = pygame.Color(BLACK)
+GarisEndY_color = GarisEndY_color_inactive
+GarisEndY_active = False
+GarisEndY_input_text = ''
 
 # Loop Utama
 running = True
@@ -214,15 +268,21 @@ while running:
         pygame.draw.rect(screen, BLACK, (250, 10, 940, 680)) #1190x690
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
 
-        for shape in Shape:
-            if shape[0] == 'persegi':
-                x, y, width, height = shape[1:]
+        for bentuk in Shape:
+            if bentuk[0] == 'persegi':
+                x, y, width, height = bentuk[1:]
                 persegi_surf = draw_persegi(x, y, width, height)
                 screen.blit(persegi_surf, (x + 255, y + 15))
+            elif bentuk[0] == 'garis':
+                garis_surf = draw_garis(bentuk[1], bentuk[2], bentuk[3], bentuk[4])
+                screen.blit(garis_surf, (min(bentuk[1], bentuk[3]) + 255, min(bentuk[2], bentuk[4]) + 15))
         
         # Gambar tombol
         for button in ButtonsMenggambar:
-            btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
+            if button['label'] == "Clear" or button['label'] == "Undo":
+                btn_surf = Button(0, 0, 90, 180, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
+            else:
+                btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
             screen.blit(btn_surf, button['pos'])
 
         # Event handling
@@ -244,13 +304,18 @@ while running:
                     elif button['label'] == 'Kurva' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
                         ShowPageKurva = True
                         ShowPageMenggambar = False
-                    elif button['label'] == 'Clear' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                        pass
-                    elif button['label'] == 'Undo' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                        pass
+                    elif button['label'] == 'Clear' and isClicked((mouse_x, mouse_y), button['pos'], 90, 180):
+                        Shape.clear()
+                    elif button['label'] == 'Undo' and isClicked((mouse_x, mouse_y), button['pos'], 90, 180):
+                        if len(Shape) == 0:
+                            pass
+                        else:
+                            Shape.pop()
+                        print(Shape)
                     elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
                         ShowMenu = True
                         ShowPageMenggambar = False
+                        Shape.clear()
 
     # Page Menggambar Persegi
     elif ShowPagePersegi:
@@ -258,11 +323,14 @@ while running:
         pygame.draw.rect(screen, BLACK, (250, 10, 940, 680)) #1190x690
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
 
-        for shape in Shape:
-            if shape[0] == 'persegi':
-                x, y, width, height = shape[1:]
+        for bentuk in Shape:
+            if bentuk[0] == 'persegi':
+                x, y, width, height = bentuk[1:]
                 persegi_surf = draw_persegi(x, y, width, height)
                 screen.blit(persegi_surf, (x + 255, y + 15))
+            elif bentuk[0] == 'garis':
+                garis_surf = draw_garis(bentuk[1], bentuk[2], bentuk[3], bentuk[4])
+                screen.blit(garis_surf, (min(bentuk[1], bentuk[3]) + 255, min(bentuk[2], bentuk[4]) + 15))
         
         for button in ButtonsPersegi:
             btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
@@ -313,13 +381,20 @@ while running:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 for button in ButtonsPersegi:
                     if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                        print (f"Nilai variabel x: {x}")
-                        print (f"Nilai variabel y: {y}")
-                        print (f"Nilai variabel x: {Panjang}")
-                        print (f"Nilai variabel x: {Lebar}")
-                        print (f"Nilai variabel SHAPE: {shape}")
-                        
-
+                        if Update == 0:
+                            x = int(PersegiStartX_input_text)
+                            y = int(PersegiStartY_input_text)
+                            Panjang = int(PersegiPanjang_input_text)
+                            Lebar = int(PersegiLebar_input_text)
+                            Shape.append(('persegi', x, y, Panjang, Lebar))
+                            Update += 1
+                        if Update > 0:
+                            x = int(PersegiStartX_input_text)
+                            y = int(PersegiStartY_input_text)
+                            Panjang = int(PersegiPanjang_input_text)
+                            Lebar = int(PersegiLebar_input_text)
+                            Shape.pop()
+                            Shape.append(('persegi', x, y, Panjang, Lebar))
                     elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
                         try:
                             x = int(PersegiStartX_input_text)
@@ -327,14 +402,31 @@ while running:
                             Panjang = int(PersegiPanjang_input_text)
                             Lebar = int(PersegiLebar_input_text)
                             Shape.append(('persegi', x, y, Panjang, Lebar))
+                            PersegiStartX_input_text = ''
+                            PersegiStartY_input_text = ''
+                            PersegiPanjang_input_text = ''
+                            PersegiLebar_input_text = ''
+                            x = 0
+                            y = 0
+                            panjang = 0
+                            lebar = 0
+                            Update = 0
                         except ValueError:
-                            print("Invalid input")
                             continue
                         ShowPagePersegi = False
                         ShowPageMenggambar = True
                     elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
                         ShowPageMenggambar = True
                         ShowPagePersegi = False
+                        PersegiStartX_input_text = ''
+                        PersegiStartY_input_text = ''
+                        PersegiPanjang_input_text = ''
+                        PersegiLebar_input_text = ''
+                        x = 0
+                        y = 0
+                        panjang = 0
+                        lebar = 0
+                        Update = 0
 
                 if PersegiStartX_input_box.collidepoint(event.pos):
                     PersegiStartX_active = not PersegiStartX_active
@@ -365,7 +457,6 @@ while running:
             elif event.type == pygame.KEYDOWN and PersegiStartX_active:
                 if event.key == pygame.K_RETURN:
                     PersegiStartX_input_text = int(PersegiStartX_input_text)
-                    PersegiStartX_input_text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     PersegiStartX_input_text = PersegiStartX_input_text[:-1]
                 else:
@@ -375,7 +466,6 @@ while running:
             elif event.type == pygame.KEYDOWN and PersegiStartY_active:
                 if event.key == pygame.K_RETURN:
                     PersegiStartY_input_text = int(PersegiStartY_input_text)
-                    PersegiStartY_input_text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     PersegiStartY_input_text = PersegiStartY_input_text[:-1]
                 else:
@@ -385,7 +475,6 @@ while running:
             elif event.type == pygame.KEYDOWN and PersegiPanjang_active:
                 if event.key == pygame.K_RETURN:
                     PersegiPanjang_input_text = int(PersegiPanjang_input_text)
-                    PersegiPanjang_input_text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     PersegiPanjang_input_text = PersegiPanjang_input_text[:-1]
                 else:
@@ -395,7 +484,6 @@ while running:
             elif event.type == pygame.KEYDOWN and PersegiLebar_active:
                 if event.key == pygame.K_RETURN:
                     PersegiLebar_input_text = int(PersegiLebar_input_text)
-                    PersegiLebar_input_text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     PersegiLebar_input_text = PersegiLebar_input_text[:-1]
                 else:
@@ -407,8 +495,7 @@ while running:
         # Canvas untuk menggambar
         pygame.draw.rect(screen, BLACK, (250, 10, 940, 680)) #1190x690
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
-
-        # Gambar tombol
+        
         for button in ButtonsLingkaran:
             btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
             screen.blit(btn_surf, button['pos'])
@@ -419,13 +506,14 @@ while running:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    pass
-                elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    pass
-                elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    ShowPageMenggambar = True
-                    ShowPageLingkaran = False
+                for button in ButtonsLingkaran:
+                    if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        pass
+                    elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        pass
+                    elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        ShowPageMenggambar = True
+                        ShowPageLingkaran = False
 
     # Page Menggambar Garis
     elif ShowPageGaris:
@@ -433,9 +521,55 @@ while running:
         pygame.draw.rect(screen, BLACK, (250, 10, 940, 680)) #1190x690
         pygame.draw.rect(screen, WHITE, (255, 15, 930, 670)) #1185x685
 
+        for bentuk in Shape:
+            if bentuk[0] == 'persegi':
+                x, y, width, height = bentuk[1:]
+                persegi_surf = draw_persegi(x, y, width, height)
+                screen.blit(persegi_surf, (x + 255, y + 15))
+            elif bentuk[0] == 'garis':
+                garis_surf = draw_garis(bentuk[1], bentuk[2], bentuk[3], bentuk[4])
+                screen.blit(garis_surf, (min(bentuk[1], bentuk[3]) + 255, min(bentuk[2], bentuk[4]) + 15))
+        
         for button in ButtonsGaris:
             btn_surf = Button(0, 0, 200, 80, button['label'], button['TextColor'], button['ButtonColor'], 25, 18)
             screen.blit(btn_surf, button['pos'])
+
+        GarisStartX = InputBox(screen,
+                                 font,
+                                 GarisStartX_input_box,
+                                 GarisStartX_input_text,
+                                 GarisStartX_color_inactive,
+                                 GarisStartX_color_active,
+                                 GarisStartX_active)
+        
+        GarisStartY = InputBox(screen,
+                                 font,
+                                 GarisStartY_input_box,
+                                 GarisStartY_input_text,
+                                 GarisStartY_color_inactive,
+                                 GarisStartY_color_active,
+                                 GarisStartY_active)
+        
+        GarisEndX = InputBox(screen,
+                                 font,
+                                 GarisEndX_input_box,
+                                 GarisEndX_input_text,
+                                 GarisEndX_color_inactive,
+                                 GarisEndX_color_active,
+                                 GarisEndX_active)
+        
+        GarisEndY = InputBox(screen,
+                                 font,
+                                 GarisEndY_input_box,
+                                 GarisEndY_input_text,
+                                 GarisEndY_color_inactive,
+                                 GarisEndY_color_active,
+                                 GarisEndY_active)
+        
+        draw_text(screen, "Titik Mulai Sumbu X", fontPersegi, (25, 40), pygame.Color('black'))
+        draw_text(screen, "Titik Mulai Sumbu Y", fontPersegi, (25, 120), pygame.Color('black'))
+        draw_text(screen, "Titik Akhir Sumbu X", fontPersegi, (25, 200), pygame.Color('black'))
+        draw_text(screen, "Titik Akhir Sumbu Y", fontPersegi, (25, 280), pygame.Color('black'))
 
         # Event handling
         for event in pygame.event.get():
@@ -443,13 +577,116 @@ while running:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    pass
-                elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    pass
-                elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    ShowPageMenggambar = True
-                    ShowPageGaris = False
+                for button in ButtonsGaris:
+                    if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        if Update == 0:
+                            x = int(GarisStartX_input_text)
+                            y = int(GarisStartY_input_text)
+                            endx = int(GarisEndX_input_text)
+                            endy = int(GarisEndY_input_text)
+                            Shape.append(('garis', x, y, endx, endy))
+                            Update += 1
+                        if Update > 0:
+                            x = int(GarisStartX_input_text)
+                            y = int(GarisStartY_input_text)
+                            endx = int(GarisEndX_input_text)
+                            endy = int(GarisEndY_input_text)
+                            Shape.pop()
+                            Shape.append(('garis', x, y, endx, endy))
+                    elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        try:
+                            x = int(GarisStartX_input_text)
+                            y = int(GarisStartY_input_text)
+                            endx = int(GarisEndX_input_text)
+                            endy = int(GarisEndY_input_text)
+                            Shape.append(('garis', x, y, endx, endy))
+                            GarisStartX_input_text = ''
+                            GarisStartY_input_text = ''
+                            GarisEndX_input_text = ''
+                            GarisEndY_input_text = ''
+                            x = 0
+                            y = 0
+                            endx = 0
+                            endy = 0
+                            Update = 0
+                        except ValueError:
+                            continue
+                        ShowPagePersegi = False
+                        ShowPageMenggambar = True
+                    elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        ShowPageMenggambar = True
+                        ShowPageGaris = False
+                        GarisStartX_input_text = ''
+                        GarisStartY_input_text = ''
+                        GarisEndX_input_text = ''
+                        GarisEndY_input_text = ''
+                        x = 0
+                        y = 0
+                        endx = 0
+                        endy = 0
+                        Update = 0
+
+                if GarisStartX_input_box.collidepoint(event.pos):
+                    GarisStartX_active = not GarisStartX_active
+                    GarisStartY_active = False
+                    GarisEndX_active = False
+                    GarisEndY_active = False
+                elif GarisStartY_input_box.collidepoint(event.pos):
+                    GarisStartY_active = not GarisStartY_active
+                    GarisStartX_active = False
+                    GarisEndX_active = False
+                    GarisEndY_active = False
+                elif GarisEndX_input_box.collidepoint(event.pos):
+                    GarisEndX_active = not GarisEndX_active
+                    GarisStartX_active = False
+                    GarisStartY_active = False
+                    GarisEndY_active = False
+                elif GarisEndY_input_box.collidepoint(event.pos):
+                    GarisEndY_active = not GarisEndY_active
+                    GarisStartX_active = False
+                    GarisStartY_active = False
+                    GarisEndX_active = False
+                else:
+                    GarisStartX_active = False
+                    GarisStartY_active = False
+                    PersegiPanjang_active = False
+                    PersegiLebar_active = False
+
+            elif event.type == pygame.KEYDOWN and GarisStartX_active:
+                if event.key == pygame.K_RETURN:
+                    GarisStartX_input_text = int(GarisStartX_input_text)
+                elif event.key == pygame.K_BACKSPACE:
+                    GarisStartX_input_text = GarisStartX_input_text[:-1]
+                else:
+                    GarisStartX_input_text += event.unicode
+                    x = GarisStartX_input_text
+
+            elif event.type == pygame.KEYDOWN and GarisStartY_active:
+                if event.key == pygame.K_RETURN:
+                    GarisStartY_input_text = int(GarisStartY_input_text)
+                elif event.key == pygame.K_BACKSPACE:
+                    GarisStartY_input_text = GarisStartY_input_text[:-1]
+                else:
+                    GarisStartY_input_text += event.unicode
+                    y = GarisStartY_input_text
+
+            elif event.type == pygame.KEYDOWN and GarisEndX_active:
+                if event.key == pygame.K_RETURN:
+                    GarisEndX_input_text = int(GarisEndX_input_text)
+                elif event.key == pygame.K_BACKSPACE:
+                    GarisEndX_input_text = GarisEndX_input_text[:-1]
+                else:
+                    GarisEndX_input_text += event.unicode
+                    endx = GarisEndX_input_text
+
+            elif event.type == pygame.KEYDOWN and GarisEndY_active:
+                if event.key == pygame.K_RETURN:
+                    GarisEndY_input_text = int(GarisEndY_input_text)
+                elif event.key == pygame.K_BACKSPACE:
+                    GarisEndY_input_text = GarisEndY_input_text[:-1]
+                else:
+                    GarisEndY_input_text += event.unicode
+                    endy = GarisEndY_input_text
 
     # Page Menggambar Kurva
     elif ShowPageKurva:
@@ -467,13 +704,14 @@ while running:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    pass
-                elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    pass
-                elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
-                    ShowPageMenggambar = True
-                    ShowPageKurva = False
+                for button in ButtonsGaris:
+                    if button['label'] == 'Update' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        pass
+                    elif button['label'] == 'Save' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        pass
+                    elif button['label'] == 'Back' and isClicked((mouse_x, mouse_y), button['pos'], 200, 80):
+                        ShowPageMenggambar = True
+                        ShowPageKurva = False
 
     pygame.display.flip()
 
